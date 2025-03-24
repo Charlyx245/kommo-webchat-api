@@ -1,4 +1,15 @@
 export default async function handler(req, res) {
+  // Permitir solicitudes CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Responder a preflight request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // Solo permitimos POST
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Método no permitido" });
   }
@@ -10,6 +21,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Crear lead
     const response = await fetch("https://sinocaydiseno.kommo.com/api/v4/leads", {
       method: "POST",
       headers: {
@@ -30,12 +42,12 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    if (!data._embedded || !data._embedded.leads || !data._embedded.leads[0]?.id) {
+    const leadId = data._embedded?.leads?.[0]?.id;
+    if (!leadId) {
       throw new Error("No se pudo crear el lead");
     }
 
-    const leadId = data._embedded.leads[0].id;
-
+    // Agregar nota al lead
     await fetch(`https://sinocaydiseno.kommo.com/api/v4/leads/${leadId}/notes`, {
       method: "POST",
       headers: {
@@ -50,7 +62,7 @@ export default async function handler(req, res) {
       })
     });
 
-    return res.status(200).json({ status: "Mensaje enviado" });
+    return res.status(200).json({ status: "Mensaje enviado correctamente" });
 
   } catch (error) {
     console.error("Error al conectar con Kommo:", error);
