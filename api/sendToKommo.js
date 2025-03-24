@@ -1,27 +1,23 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método no permitido" });
+    return res.status(405).json({ message: "Método no permitido" });
   }
 
   const { name, message } = req.body;
 
   if (!name || !message) {
-    return res.status(400).json({ error: "Faltan datos" });
+    return res.status(400).json({ message: "Faltan datos" });
   }
 
-  const KOMMO_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjYyMzkzNTExYmMxMzM5OGRlMjM0YTYwYTE2ODExZGVhOTQ0ZWYyZWYxNDliYzU3ZjE2NTk3NGExZDg5ODhiN2MzOWNmOWFiMmJjZWVhZmM0In0.eyJhdWQiOiI1NTNjNmYwYy1iNmIyLTRjMDUtOGM1Yi01YTZhNTVlMDFkOTEiLCJqdGkiOiI2MjM5MzUxMWJjMTMzOThkZTIzNGE2MGExNjgxMWRlYTk0NGVmMmVmMTQ5YmM1N2YxNjU5NzRhMWQ4OTg4YjdjMzljZjlhYjJiY2VlYWZjNCIsImlhdCI6MTc0Mjc4OTczMywibmJmIjoxNzQyNzg5NzMzLCJleHAiOjE3NDg2NDk2MDAsInN1YiI6IjEyOTE0Mjg3IiwiZ3JhbnRfdHlwZSI6IiIsImFjY291bnRfaWQiOjM0MzQ1MjMxLCJiYXNlX2RvbWFpbiI6ImtvbW1vLmNvbSIsInZlcnNpb24iOjIsInNjb3BlcyI6WyJjcm0iLCJmaWxlcyIsImZpbGVzX2RlbGV0ZSIsIm5vdGlmaWNhdGlvbnMiLCJwdXNoX25vdGlmaWNhdGlvbnMiXSwiaGFzaF91dWlkIjoiYmVkYjdjMjYtMDA1Yy00MDFjLWI1YTgtYmI2YjRhYWNiNGYxIiwiYXBpX2RvbWFpbiI6ImFwaS1jLmtvbW1vLmNvbSJ9.DjHRhApBqwRKBgB3MpXBkEat9HKHb2diqNvn5I1Jt_1w0PNqtUYeSnREXDRxLZACwJ2XqqdV49ZlMxkiM-FuOZFMFz0ju0vLytlERZOpDNg9Gt7VV7BjwzsVsi5Lamc_8ELbUkPbWnVXsQ1KTw4BQ5PkSaLbzUkpBxZ4exQGO6b-C8Q63xn7-dHksuvdu95wCP8ZaiUVe4rTiu2qHx--OusdbCMQnhQdmeSgW9QLuYHOsw7yFZ3hH5206Detx3VuoseP6D8P8wsGONrXKOnzFJT1EhKdFSJlDTZWQUzTIwF5XGNN36X6PaGlm9a0htyeW9IwRLHg3ZqEUSH7P8LQyA"; // 🔁 Reemplazá con tu token de larga duración
-  const KOMMO_DOMAIN = "https://sinocaydiseno.kommo.com";
-
   try {
-    // 1. Crear LEAD
-    const leadResponse = await fetch(`${KOMMO_DOMAIN}/api/v4/leads`, {
+    const response = await fetch("https://sinocaydiseno.kommo.com/api/v4/leads", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${KOMMO_TOKEN}`,
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjNlMTVjZjY5NWFmYmNhZDU2YzBkZDAwMzhhNTQyYzA3NTM0NDg4YzRmMjM5YWQ4YzBlNDhiMTZlYTIzYmJlMDdiODE5YjJmNDg1MjA0ZjVhIn0.eyJhdWQiOiI1NTNjNmYwYy1iNmIyLTRjMDUtOGM1Yi01YTZhNTVlMDFkOTEiLCJqdGkiOiIzZTE1Y2Y2OTVhZmJjYWQ1NmMwZGQwMDM4YTU0MmMwNzUzNDQ4OGM0ZjIzOWFkOGMwZTQ4YjE2ZWEyM2JiZTA3YjgxOWIyZjQ4NTIwNGY1YSIsImlhdCI6MTc0Mjc5MTE4NSwibmJmIjoxNzQyNzkxMTg1LCJleHAiOjE3ODU0NTYwMDAsInN1YiI6IjEyOTE0Mjg3IiwiZ3JhbnRfdHlwZSI6IiIsImFjY291bnRfaWQiOjM0MzQ1MjMxLCJiYXNlX2RvbWFpbiI6ImtvbW1vLmNvbSIsInZlcnNpb24iOjIsInNjb3BlcyI6WyJjcm0iLCJmaWxlcyIsImZpbGVzX2RlbGV0ZSIsIm5vdGlmaWNhdGlvbnMiLCJwdXNoX25vdGlmaWNhdGlvbnMiXSwiaGFzaF91dWlkIjoiMjQ3MDEzMTMtNDE2Yy00ODdlLWI1YzktY2MzODhmYzNiZTAxIiwiYXBpX2RvbWFpbiI6ImFwaS1jLmtvbW1vLmNvbSJ9.cdia32dHopUTkqhiBUhmONzydTFyxBCCjfY0gXWQhT3oJru9w03QEMEnZTrkLykAG_-TD-GEW4NlXcOek89zgkKv-5YOnEepQmkMhDtXX9uspTNo7KvluDDf_r8sNqq8uMuC-iuLHN0_wGGe7nf45o0kQgcHZ1r8-z2UhxKEto_WULzW5WLaNafnp7sqWR-a4hXrFI3HSuWnG4CO1GT1A8kCjdBS2AlQwLhjMVBXS3Cb7953QM4yxHHg9kLTFwvA4PdsrWIGgUoFLxw2fg_3jIKzwTXl1G5Eiccq8QWPQ7Wjh5BrF0Pyu7sHrZYte2CVU5kyC5stEe87xwMf98qlRg"
       },
       body: JSON.stringify({
-        name: [`Lead desde Webchat - ${name}`],
+        name: [`Lead Webchat - ${name}`],
         _embedded: {
           contacts: [
             {
@@ -29,37 +25,35 @@ export default async function handler(req, res) {
             }
           ]
         }
-      }),
+      })
     });
 
-    const leadData = await leadResponse.json();
+    const data = await response.json();
 
-    if (!leadResponse.ok || !leadData._embedded?.leads?.[0]?.id) {
+    if (!data._embedded || !data._embedded.leads || !data._embedded.leads[0]?.id) {
       throw new Error("No se pudo crear el lead");
     }
 
-    const leadId = leadData._embedded.leads[0].id;
+    const leadId = data._embedded.leads[0].id;
 
-    // 2. Enviar nota al lead
-    const noteResponse = await fetch(`${KOMMO_DOMAIN}/api/v4/leads/${leadId}/notes`, {
+    await fetch(`https://sinocaydiseno.kommo.com/api/v4/leads/${leadId}/notes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${KOMMO_TOKEN}`,
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjNlMTVjZjY5NWFmYmNhZDU2YzBkZDAwMzhhNTQyYzA3NTM0NDg4YzRmMjM5YWQ4YzBlNDhiMTZlYTIzYmJlMDdiODE5YjJmNDg1MjA0ZjVhIn0.eyJhdWQiOiI1NTNjNmYwYy1iNmIyLTRjMDUtOGM1Yi01YTZhNTVlMDFkOTEiLCJqdGkiOiIzZTE1Y2Y2OTVhZmJjYWQ1NmMwZGQwMDM4YTU0MmMwNzUzNDQ4OGM0ZjIzOWFkOGMwZTQ4YjE2ZWEyM2JiZTA3YjgxOWIyZjQ4NTIwNGY1YSIsImlhdCI6MTc0Mjc5MTE4NSwibmJmIjoxNzQyNzkxMTg1LCJleHAiOjE3ODU0NTYwMDAsInN1YiI6IjEyOTE0Mjg3IiwiZ3JhbnRfdHlwZSI6IiIsImFjY291bnRfaWQiOjM0MzQ1MjMxLCJiYXNlX2RvbWFpbiI6ImtvbW1vLmNvbSIsInZlcnNpb24iOjIsInNjb3BlcyI6WyJjcm0iLCJmaWxlcyIsImZpbGVzX2RlbGV0ZSIsIm5vdGlmaWNhdGlvbnMiLCJwdXNoX25vdGlmaWNhdGlvbnMiXSwiaGFzaF91dWlkIjoiMjQ3MDEzMTMtNDE2Yy00ODdlLWI1YzktY2MzODhmYzNiZTAxIiwiYXBpX2RvbWFpbiI6ImFwaS1jLmtvbW1vLmNvbSJ9.cdia32dHopUTkqhiBUhmONzydTFyxBCCjfY0gXWQhT3oJru9w03QEMEnZTrkLykAG_-TD-GEW4NlXcOek89zgkKv-5YOnEepQmkMhDtXX9uspTNo7KvluDDf_r8sNqq8uMuC-iuLHN0_wGGe7nf45o0kQgcHZ1r8-z2UhxKEto_WULzW5WLaNafnp7sqWR-a4hXrFI3HSuWnG4CO1GT1A8kCjdBS2AlQwLhjMVBXS3Cb7953QM4yxHHg9kLTFwvA4PdsrWIGgUoFLxw2fg_3jIKzwTXl1G5Eiccq8QWPQ7Wjh5BrF0Pyu7sHrZYte2CVU5kyC5stEe87xwMf98qlRg"
       },
       body: JSON.stringify({
         note_type: "common",
-        params: { text: message }
-      }),
+        params: {
+          text: message
+        }
+      })
     });
 
-    if (!noteResponse.ok) {
-      throw new Error("No se pudo enviar la nota");
-    }
+    return res.status(200).json({ status: "Mensaje enviado" });
 
-    return res.status(200).json({ status: "Mensaje enviado correctamente", leadId });
-  } catch (err) {
-    console.error("Error al conectar con Kommo:", err);
-    return res.status(500).json({ error: "Error al conectar con Kommo" });
+  } catch (error) {
+    console.error("Error al conectar con Kommo:", error);
+    return res.status(500).json({ message: "Error al conectar con Kommo" });
   }
 }
