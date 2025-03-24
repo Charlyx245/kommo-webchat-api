@@ -1,57 +1,71 @@
 export default async function handler(req, res) {
+  // Habilitar CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejo del método OPTIONS (preflight request)
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST method allowed" });
+    return res.status(405).json({ error: "Método no permitido" });
   }
 
-  const token = process.env.KOMMO_TOKEN;
-  const { username, message } = req.body;
+  const { name, message } = req.body;
 
-  if (!username || !message) {
-    return res.status(400).json({ error: "Missing username or message" });
+  if (!name || !message) {
+    return res.status(400).json({ error: "Faltan datos requeridos" });
   }
+
+  // 🔐 Tu token de acceso largo de Kommo
+  const accessToken = "AQUI_TU_TOKEN";
+  const baseUrl = "https://sinocaydiseno.kommo.com";
 
   try {
-    // Crear lead en Kommo
-    const leadResp = await fetch("https://sinocaydiseno.kommo.com/api/v4/leads", {
+    // Crear lead
+    const leadResponse = await fetch(`${baseUrl}/api/v4/leads`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        name: `Lead Webchat - ${username}`,
+        name: `Lead Webchat - ${name}`,
         _embedded: {
-          contacts: [
-            { first_name: username }
-          ]
+          contacts: [{ first_name: name }]
         }
       })
     });
 
-    const leadData = await leadResp.json();
-    const leadId = leadData.id || leadData._embedded?.leads?.[0]?.id;
+    const leadData = await leadResponse.json();
+    const leadId = leadData.id || (leadData._embedded?.leads?.[0]?.id);
 
     if (!leadId) {
-      return res.status(500).json({ error: "Failed to create lead in Kommo" });
+      throw new Error("No se pudo crear el lead");
     }
 
-    // Enviar nota con mensaje
-    await fetch(`https://sinocaydiseno.kommo.com/api/v4/leads/${leadId}/notes`, {
+    // Agregar nota al lead
+    const noteResponse = await fetch(`${baseUrl}/api/v4/leads/${leadId}/notes`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         note_type: "common",
-        params: {
-          text: message
-        }
+        params: { text: message }
       })
     });
 
-    return res.status(200).json({ success: true, leadId });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+    if (!noteResponse.ok) {
+      throw new Error("Error al agregar nota");
+    }
+
+    res.status(200).json({ success: true, leadId });
+  } catch (error) {
+    console.error("Error al conectar con Kommo:", error);
+    res.status(500).json({ success: false, error: error.message });
   }
 }
